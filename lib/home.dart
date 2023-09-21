@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:training/chat%20page.dart';
 
 
@@ -15,6 +16,47 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   FirebaseAuth _auth = FirebaseAuth.instance;
+  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+
+  @override
+  void initState() {
+    super.initState();
+    final InitializationSettings initializationSettings =
+    InitializationSettings(
+      android: AndroidInitializationSettings('app_icon'), // Adjust as needed
+    );
+    flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+    );
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      // Handle foreground messages here
+      displayNotification(message);
+    });
+  }
+
+  Future<void> onSelectNotification(String? payload) async {
+    // Handle notification tap
+  }
+
+  Future<void> displayNotification(RemoteMessage message) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+    AndroidNotificationDetails(
+      'your_channel_id', 'Your channel name',
+      importance: Importance.max,
+      priority: Priority.high,
+    );
+    const NotificationDetails platformChannelSpecifics =
+    NotificationDetails(android: androidPlatformChannelSpecifics);
+    await flutterLocalNotificationsPlugin.show(
+      0, // Notification ID
+      message.notification?.title ?? '',
+      message.notification?.body ?? '',
+      platformChannelSpecifics,
+      payload: message.data['your_data_key'],
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {

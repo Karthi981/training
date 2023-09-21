@@ -17,10 +17,11 @@ class FirebaseApi {
     await _firebaseMessaging.requestPermission();
     String? token1 = await FirebaseMessaging.instance.getToken();
     print('Token: $token1');
+
      FirebaseAuth.instance.authStateChanges().listen((firebaseUser) {
        if(firebaseUser != null){
        createtoken(token1!);
-       print(firebaseUser);
+      // print(firebaseUser);
        }else{
        print("Please Login");
        print(firebaseUser);
